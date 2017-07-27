@@ -4,7 +4,7 @@
   "description": "A nodejs API for Dat which is compatible with Beaker's DatArchive API",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ava -s test/api.js"
   },
   "repository": {
     "type": "git",
@@ -20,5 +20,17 @@
   "bugs": {
     "url": "https://github.com/beakerbrowser/node-dat-archive/issues"
   },
-  "homepage": "https://github.com/beakerbrowser/node-dat-archive#readme"
+  "homepage": "https://github.com/beakerbrowser/node-dat-archive#readme",
+  "dependencies": {
+    "beaker-error-constants": "^1.1.1",
+    "concat-stream": "^1.6.0",
+    "dat-node": "^3.5.1",
+    "dom-event-target": "^1.0.0",
+    "parse-dat-url": "^3.0.1",
+    "pauls-dat-api": "^4.2.5"
+  },
+  "devDependencies": {
+    "ava": "^0.21.0",
+    "tempy": "^0.1.0"
+  }
 }

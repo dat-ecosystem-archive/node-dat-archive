@@ -4,21 +4,26 @@ A nodejs API for Dat which is compatible with Beaker's DatArchive API. Useful fo
 
 ```js
 var DatArchive = require('node-dat-archive')
+
 var archive = await DatArchive.create({
   localPath: './my-archive-data',
   title: 'My Archive',
   description: 'A test of the node DatArchive API'
 })
+
 var names = await archive.readdir('/')
 console.log(names) // => ['index.html', 'images']
+
 await archive.writeFile('hello.txt', 'world')
 ```
 
 ### Differences from Browser API
 
-This module adds the `localPath` parameter to `new DatArchive`, `DatArchive.create`, and `DatArchive.fork`. This module also does not include `DatArchive.selectArchive`.
-
-Use the `localPath` to specify where the data for the archive should be stored.
+ - This module adds the `localPath` parameter to `new DatArchive` and `DatArchive.create`. Use the `localPath` to specify where the data for the archive should be stored.
+ - This module does not include `DatArchive.fork`.
+ - This module does not include `DatArchive.selectArchive`.
+ - `archive.getInfo()` does not give a valid `mtime`, `metaSize`, or `stagingSize`
+ - Unlike in the browser, this API does not have a staging area. All modifications are published immediately. The `diff()`, `commit()`, and `revert()` commands are noops.
 
 ### Quick API reference
 
@@ -27,7 +32,6 @@ Refer to the [Beaker `DatArchive` docs](https://beakerbrowser.com/docs/apis/dat.
 ```js
 var archive = new DatArchive(url, {localPath:})
 var archive = await DatArchive.create({localPath:, title:, description:})
-var archive = await DatArchive.fork(url, {localPath:, title:, description:})
 var key = await DatArchive.resolveName(url)
 archive.url
 var info = await archive.getInfo({timeout:})
