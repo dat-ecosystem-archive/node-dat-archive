@@ -1,0 +1,24 @@
+{
+  "name": "node-dat-archive",
+  "version": "1.0.0",
+  "description": "A nodejs API for Dat which is compatible with Beaker's DatArchive API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/beakerbrowser/node-dat-archive.git"
+  },
+  "keywords": [
+    "dat",
+    "beaker",
+    "p2p"
+  ],
+  "author": "Paul Frazee <pfrazee@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/beakerbrowser/node-dat-archive/issues"
+  },
+  "homepage": "https://github.com/beakerbrowser/node-dat-archive#readme"
+}
