@@ -36,7 +36,7 @@ class DatArchive {
     this._localPath = localPath
     this._loadPromise = new Promise((resolve, reject) => {
       // TODO resolve DNS
-      Dat(localPath, urlp ? {key: urlp.hostname, sparse: true, latest: false} : {temp: true, latest: false}, async (err, dat) => {
+      Dat(localPath, urlp ? {key: urlp.hostname, sparse: true, latest: false} : {indexing: false, latest: false}, async (err, dat) => {
         if (err) {
           return reject(err)
         }
