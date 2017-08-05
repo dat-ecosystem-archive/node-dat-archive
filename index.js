@@ -64,7 +64,7 @@ class DatArchive {
   static async create ({localPath, title, description}) {
     var archive = new DatArchive(null, {localPath})
     await archive._loadPromise
-    await pda.writeFile(archive._archive, '/dat.json', JSON.stringify({title, description}))
+    await pda.writeFile(archive._archive, '/dat.json', JSON.stringify({url: archive.url, title, description}))
     return archive
   }
 
