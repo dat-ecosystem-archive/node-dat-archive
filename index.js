@@ -3,6 +3,7 @@ const parseDatURL = require('parse-dat-url')
 const pda = require('pauls-dat-api')
 const concat = require('concat-stream')
 const Dat = require('dat-node')
+const ram = require('random-access-memory')
 const {datDns, timer, toEventTarget} = require('./lib/util')
 const {
   DAT_MANIFEST_FILENAME,
@@ -24,7 +25,7 @@ const to = (opts) =>
     : DEFAULT_DAT_API_TIMEOUT
 
 class DatArchive {
-  constructor (url, {localPath}) {
+  constructor (url, {localPath} = {}) {
     // parse URL
     const urlp = url ? parseDatURL(url) : null
     this.url = urlp ? `dat://${urlp.hostname}` : null
@@ -36,7 +37,8 @@ class DatArchive {
     this._localPath = localPath
     this._loadPromise = new Promise((resolve, reject) => {
       // TODO resolve DNS
-      Dat(localPath, urlp ? {key: urlp.hostname, sparse: true, latest: false} : {indexing: false, latest: false}, async (err, dat) => {
+      const temp = !localPath
+      Dat(localPath || ram, urlp ? {key: urlp.hostname, sparse: true, latest: false, temp} : {indexing: false, latest: false, temp}, async (err, dat) => {
         if (err) {
           return reject(err)
         }

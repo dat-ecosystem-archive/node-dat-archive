@@ -19,7 +19,7 @@ await archive.writeFile('hello.txt', 'world')
 
 ### Differences from Browser API
 
- - This module adds the `localPath` parameter to `new DatArchive` and `DatArchive.create`. Use the `localPath` to specify where the data for the archive should be stored.
+ - This module adds the `localPath` parameter to `new DatArchive` and `DatArchive.create`. Use the `localPath` to specify where the data for the archive should be stored. If not provided, the archive will be stored in memory.
  - This module does not include `DatArchive.fork`.
  - This module does not include `DatArchive.selectArchive`.
  - `archive.getInfo()` does not give a valid `mtime`, `metaSize`, or `stagingSize`
