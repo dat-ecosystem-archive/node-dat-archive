@@ -46,6 +46,14 @@ class DatArchive {
         this.url = this.url || `dat://${dat.archive.key.toString('hex')}`
         this._archive = dat.archive
         this._checkout = (this._version) ? dat.archive.checkout(this._version) : dat.archive
+        this._close = async () => {
+          await new Promise((resolve, reject) => {
+            dat.close(err => {
+              if (err) reject(err)
+              else resolve()
+            })
+          })
+        }
 
         // await initial metadata sync if not the owner
         if (!dat.archive.writable && !dat.archive.metadata.length) {

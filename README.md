@@ -49,4 +49,8 @@ var history = await archive.history({start:, end:, reverse:, timeout:})
 await archive.download(path, {timeout:})
 var emitter = archive.createFileActivityStream(pattern)
 var emitter = archive.createNetworkActivityStream()
+
+// node-only:
+archive._loadPromise // promise for when the archive is ready to use
+archive._close() // exit swarm, close all files
 ```
