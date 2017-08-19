@@ -1,6 +1,6 @@
 {
   "name": "node-dat-archive",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "A nodejs API for Dat which is compatible with Beaker's DatArchive API",
   "main": "index.js",
   "scripts": {
