@@ -130,6 +130,19 @@ test('DatArchive.create', async t => {
   t.deepEqual(manifest.description, 'The Description')
 })
 
+test('archive.configure', async t => {
+  // configure it
+  await createdArchive.configure({
+    title: 'The New Title',
+    description: 'The New Description'
+  })
+
+  // check the dat.json
+  var manifest = JSON.parse(await createdArchive.readFile('dat.json'))
+  t.deepEqual(manifest.title, 'The New Title')
+  t.deepEqual(manifest.description, 'The New Description')
+})
+
 test('archive.writeFile', async t => {
   async function dotest (filename, content, encoding) {
     // write to the top-level

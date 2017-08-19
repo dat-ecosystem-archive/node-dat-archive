@@ -78,6 +78,17 @@ class DatArchive {
     return archive
   }
 
+  async configure (settings) {
+    await this._loadPromise
+    if (!settings || typeof settings !== 'object') throw new Error('Invalid argument')
+    if ('title' in settings || 'description' in settings) {
+      await pda.updateManifest(this._archive, settings)
+    }
+    if ('networked' in settings) {
+      // TODO
+    }
+  }
+
   async getInfo (url, opts = {}) {
     return timer(to(opts), async () => {
       await this._loadPromise
@@ -100,8 +111,7 @@ class DatArchive {
         version: this._checkout.version,
         peers: this._archive.metadata.peers.length,
         mtime: 0,
-        metaSize: 0,
-        stagingSize: 0,
+        size: 0,
 
         // manifest
         title: manifest.title,
