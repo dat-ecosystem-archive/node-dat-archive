@@ -81,7 +81,7 @@ class DatArchive {
   async configure (settings) {
     await this._loadPromise
     if (!settings || typeof settings !== 'object') throw new Error('Invalid argument')
-    if ('title' in settings || 'description' in settings) {
+    if ('title' in settings || 'description' in settings || 'type' in settings) {
       await pda.updateManifest(this._archive, settings)
     }
     if ('networked' in settings) {
@@ -115,7 +115,8 @@ class DatArchive {
 
         // manifest
         title: manifest.title,
-        description: manifest.description
+        description: manifest.description,
+        type: manifest.type
       }
     })
   }
