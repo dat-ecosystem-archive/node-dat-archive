@@ -71,17 +71,17 @@ class DatArchive {
     })
   }
 
-  static async create ({localPath, title, description, type}) {
+  static async create ({localPath, title, description, type, author}) {
     var archive = new DatArchive(null, {localPath})
     await archive._loadPromise
-    await pda.writeManifest(archive._archive, {url: archive.url, title, description, type})
+    await pda.writeManifest(archive._archive, {url: archive.url, title, description, type, author})
     return archive
   }
 
   async configure (settings) {
     await this._loadPromise
     if (!settings || typeof settings !== 'object') throw new Error('Invalid argument')
-    if ('title' in settings || 'description' in settings || 'type' in settings) {
+    if ('title' in settings || 'description' in settings || 'type' in settings || 'author' in settings) {
       await pda.updateManifest(this._archive, settings)
     }
     if ('networked' in settings) {
@@ -116,7 +116,8 @@ class DatArchive {
         // manifest
         title: manifest.title,
         description: manifest.description,
-        type: manifest.type
+        type: manifest.type,
+        author: manifest.author
       }
     })
   }

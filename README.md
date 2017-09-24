@@ -32,10 +32,10 @@ Refer to the [Beaker `DatArchive` docs](https://beakerbrowser.com/docs/apis/dat.
 
 ```js
 var archive = new DatArchive(url, {localPath:})
-var archive = await DatArchive.create({localPath:, title:, description:, networked:})
+var archive = await DatArchive.create({localPath:, title:, description:, type:, author:, networked:})
 var key = await DatArchive.resolveName(url)
 archive.url
-await archive.configure({title:, description:, networked:})
+await archive.configure({title:, description:, type:, author:, networked:})
 var info = await archive.getInfo({timeout:})
 var stat = await archive.stat(path, {timeout:})
 var content = await archive.readFile(path, {encoding:, timeout:})

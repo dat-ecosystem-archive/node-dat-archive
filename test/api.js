@@ -122,26 +122,34 @@ test('DatArchive.create', async t => {
   createdArchive = await DatArchive.create({
     localPath: tempy.directory(),
     title: 'The Title',
-    description: 'The Description'
+    description: 'The Description',
+    type: 'dataset',
+    author: {name: 'Bob', url: 'dat://ffffffffffffffffffffffffffffffff'}
   })
 
   // check the dat.json
   var manifest = JSON.parse(await createdArchive.readFile('dat.json'))
   t.deepEqual(manifest.title, 'The Title')
   t.deepEqual(manifest.description, 'The Description')
+  t.deepEqual(manifest.type, ['dataset'])
+  t.deepEqual(manifest.author, {name: 'Bob', url: 'dat://ffffffffffffffffffffffffffffffff'})
 })
 
 test('archive.configure', async t => {
   // configure it
   await createdArchive.configure({
     title: 'The New Title',
-    description: 'The New Description'
+    description: 'The New Description',
+    type: ['dataset', 'foo'],
+    author: {name: 'Robert', url: 'dat://ffffffffffffffffffffffffffffffff'}
   })
 
   // check the dat.json
   var manifest = JSON.parse(await createdArchive.readFile('dat.json'))
   t.deepEqual(manifest.title, 'The New Title')
   t.deepEqual(manifest.description, 'The New Description')
+  t.deepEqual(manifest.type, ['dataset', 'foo'])
+  t.deepEqual(manifest.author, {name: 'Robert', url: 'dat://ffffffffffffffffffffffffffffffff'})
 })
 
 test('archive.writeFile', async t => {
