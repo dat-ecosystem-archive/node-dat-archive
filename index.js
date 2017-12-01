@@ -25,7 +25,9 @@ const to = (opts) =>
     : DEFAULT_DAT_API_TIMEOUT
 
 class DatArchive {
-  constructor (url, {localPath} = {}) {
+  constructor (url, {localPath, latest} = {}) {
+    latest = latest || false
+
     // parse URL
     const urlp = url ? parseDatURL(url) : null
     this.url = urlp ? `dat://${urlp.hostname}` : null
@@ -38,7 +40,7 @@ class DatArchive {
     this._loadPromise = new Promise((resolve, reject) => {
       // TODO resolve DNS
       const temp = !localPath
-      Dat(localPath || ram, urlp ? {key: urlp.hostname, sparse: true, latest: false, temp} : {indexing: false, latest: false, temp}, async (err, dat) => {
+      Dat(localPath || ram, urlp ? {key: urlp.hostname, sparse: true, latest, temp} : {indexing: false, latest, temp}, async (err, dat) => {
         if (err) {
           return reject(err)
         }
@@ -71,10 +73,16 @@ class DatArchive {
     })
   }
 
-  static async create ({localPath, title, description, type, author}) {
-    var archive = new DatArchive(null, {localPath})
+  static async create ({localPath, latest, title, description, type, author}) {
+    var archive = new DatArchive(null, {localPath, latest})
     await archive._loadPromise
     await pda.writeManifest(archive._archive, {url: archive.url, title, description, type, author})
+    return archive
+  }
+
+  static async load ({localPath, latest}) {
+    var archive = new DatArchive(null, {localPath, latest})
+    await archive._loadPromise
     return archive
   }
 

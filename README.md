@@ -5,21 +5,49 @@ A nodejs API for Dat which is compatible with Beaker's DatArchive API. Useful fo
 ```js
 var DatArchive = require('node-dat-archive')
 
+// create a new archive
 var archive = await DatArchive.create({
   localPath: './my-archive-data',
   title: 'My Archive',
   description: 'A test of the node DatArchive API'
 })
 
-var names = await archive.readdir('/')
-console.log(names) // => ['index.html', 'images']
+// load an existing archive from disk
+var archive = await DatArchive.load({
+  localPath: './my-archive-data'
+})
 
+// load an existing archive from the URL:
+var archive = new DatArchive(datURL, {localPath: './my-archive-data'})
+
+// using the instance
 await archive.writeFile('hello.txt', 'world')
+var names = await archive.readdir('/')
+console.log(names) // => ['hello.txt']
+```
+
+By default, `node-dat-archive` stores the Dat data in the `localPath` folder using the SLEEP format (dat's internal structure).
+If you want the folder to show the latest files (the dat cli behavior) pass `latest: true`.
+
+```js
+var archive = await DatArchive.create({
+  localPath: './my-archive-data',
+  latest: true
+})
+var archive = await DatArchive.load({
+  localPath: './my-archive-data',
+  latest: true
+})
+var archive = new DatArchive(datURL, {
+  localPath: './my-archive-data',
+  latest: true
+})
 ```
 
 ### Differences from Browser API
 
  - This module adds the `localPath` parameter to `new DatArchive` and `DatArchive.create`. Use the `localPath` to specify where the data for the archive should be stored. If not provided, the archive will be stored in memory.
+ - This module also adds `DatArchive.load()` to read an archive from disk.
  - This module does *yet* not include `DatArchive.fork`.
  - This module does *yet* not include `DatArchive.unlink`.
  - This module will not include `DatArchive.selectArchive`.
@@ -31,8 +59,9 @@ await archive.writeFile('hello.txt', 'world')
 Refer to the [Beaker `DatArchive` docs](https://beakerbrowser.com/docs/apis/dat.html).
 
 ```js
-var archive = new DatArchive(url, {localPath:})
-var archive = await DatArchive.create({localPath:, title:, description:, type:, author:, networked:})
+var archive = new DatArchive(url, {localPath:, latest:})
+var archive = await DatArchive.create({localPath:, latest:, title:, description:, type:, author:, networked:})
+var archive = await DatArchive.load({localPath:, latest:})
 var key = await DatArchive.resolveName(url)
 archive.url
 await archive.configure({title:, description:, type:, author:, networked:})
