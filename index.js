@@ -1,4 +1,5 @@
 const path = require('path')
+const fs = require('fs')
 const parseDatURL = require('parse-dat-url')
 const pda = require('pauls-dat-api')
 const concat = require('concat-stream')
@@ -74,6 +75,21 @@ class DatArchive {
   }
 
   static async create ({localPath, latest, title, description, type, author}) {
+    // make sure the directory DNE or is empty
+    if (localPath) {
+      let st = await new Promise(resolve => fs.stat(localPath, (err, st) => resolve(st)))
+      if (st) {
+        if (!st.isDirectory()) {
+          throw new Error('Cannot create Dat archive. (A file exists at the target location.)')
+        }
+        let listing = await new Promise(resolve => fs.readdir(localPath, (err, listing) => resolve(listing)))
+        if (listing && listing.length > 0) {
+          throw new Error('Cannot create Dat archive. (The target folder is not empty.)')
+        }
+      }
+    }
+
+    // create the dat
     var archive = new DatArchive(null, {localPath, latest})
     await archive._loadPromise
     await pda.writeManifest(archive._archive, {url: archive.url, title, description, type, author})
@@ -81,6 +97,17 @@ class DatArchive {
   }
 
   static async load ({localPath, latest}) {
+    if (!localPath) {
+      throw new Error('Must provide {localPath}.')
+    }
+
+    // make sure the directory exists
+    var st = await new Promise(resolve => fs.stat(localPath, (err, st) => resolve(st)))
+    if (!st || !st.isDirectory()) {
+      throw new Error('Cannot load Dat archive. (No folder exists at the given location.)')
+    }
+
+    // load the dat
     var archive = new DatArchive(null, {localPath, latest})
     await archive._loadPromise
     return archive

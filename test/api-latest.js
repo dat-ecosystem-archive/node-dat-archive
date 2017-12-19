@@ -211,38 +211,6 @@ test('archive.writeFile writes to subdirectories', async t => {
   t.deepEqual(res, 'hello world')
 })
 
-test('versioned reads and writes', async t => {
-  // create a fresh dat
-  var archive = await DatArchive.create({latest: true, localPath: tempy.directory(), title: 'Another Test Dat'})
-
-  // do some writes
-  await archive.writeFile('/one.txt', 'a', 'utf8')
-  await archive.writeFile('/two.txt', 'b', 'utf8')
-  await archive.writeFile('/one.txt', 'c', 'utf8')
-
-  // check history
-  var history = await archive.history()
-  if (history.length !== 4) {
-    console.log('Weird history', history)
-  }
-  t.deepEqual(history.length, 4)
-
-  // helper
-  function checkout (v) {
-    return new DatArchive(archive.url + v, {latest: true, localPath: tempy.directory()})
-  }
-
-  // read back versions
-  t.deepEqual((await checkout('+1').readdir('/')).length, 1)
-  t.deepEqual((await checkout('+2').readdir('/')).length, 2)
-  t.deepEqual((await checkout('+3').readdir('/')).length, 3)
-  t.deepEqual((await checkout('+2').readFile('/one.txt')), 'a')
-  t.deepEqual((await checkout('+4').readFile('/one.txt')), 'c')
-  var statRev2 = await checkout('+2').stat('/one.txt')
-  var statRev4 = await checkout('+4').stat('/one.txt')
-  t.truthy(statRev2.offset < statRev4.offset)
-})
-
 test('Fail to write to unowned archives', async t => {
   var archive = new DatArchive(testStaticDatURL, {latest: true, localPath: tempy.directory()})
   await t.throws(archive.writeFile('/denythis.txt', 'hello world', 'utf8'))
