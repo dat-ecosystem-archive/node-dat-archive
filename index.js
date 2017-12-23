@@ -26,7 +26,7 @@ const to = (opts) =>
     : DEFAULT_DAT_API_TIMEOUT
 
 class DatArchive {
-  constructor (url, {localPath, latest, datOptions} = {}) {
+  constructor (url, {localPath, latest, datOptions, netOptions} = {}) {
     latest = latest || false
 
     // parse URL
@@ -51,7 +51,7 @@ class DatArchive {
         if (err) {
           return reject(err)
         }
-        dat.joinNetwork()
+        dat.joinNetwork(netOptions || {})
         this.url = this.url || `dat://${dat.archive.key.toString('hex')}`
         this._archive = dat.archive
         this._checkout = (this._version) ? dat.archive.checkout(this._version) : dat.archive

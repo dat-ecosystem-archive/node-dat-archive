@@ -44,13 +44,16 @@ var archive = new DatArchive(datURL, {
 })
 ```
 
-You can also pass options through to Dat with `datOptions`:
+You can also pass options through to [dat-node](https://github.com/datproject/dat-node) with `datOptions`, or pass options to its `.joinNetwork([opts])` method with `netOptions`:
 
 ```js
 var archive = new DatArchive(datURL, {
   localPath: './my-archive-data',
   datOptions: {
     live: true
+  },
+  netOptions: {
+    upload: false
   }
 })
 ```
