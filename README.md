@@ -44,6 +44,19 @@ var archive = new DatArchive(datURL, {
 })
 ```
 
+You can also pass options through to Dat with `datOptions`:
+
+```js
+var archive = new DatArchive(datURL, {
+  localPath: './my-archive-data',
+  datOptions: {
+    live: true
+  }
+})
+```
+
+This will extend node-dat-archive's defaults.
+
 ### Differences from Browser API
 
  - This module adds the `localPath` parameter to `new DatArchive` and `DatArchive.create`. Use the `localPath` to specify where the data for the archive should be stored. If not provided, the archive will be stored in memory.
