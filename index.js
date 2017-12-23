@@ -26,7 +26,7 @@ const to = (opts) =>
     : DEFAULT_DAT_API_TIMEOUT
 
 class DatArchive {
-  constructor (url, {localPath, latest} = {}) {
+  constructor (url, {localPath, latest, datOptions} = {}) {
     latest = latest || false
 
     // parse URL
@@ -41,6 +41,12 @@ class DatArchive {
     this._loadPromise = new Promise((resolve, reject) => {
       // TODO resolve DNS
       const temp = !localPath
+      let options = urlp ? {key: urlp.hostname, sparse: true, latest, temp} : {indexing: false, latest, temp}
+      if (datOptions) {
+        Object.keys(datOptions).forEach((key) => {
+          options[key] = datOptions[key]
+        })
+      }
       Dat(localPath || ram, urlp ? {key: urlp.hostname, sparse: true, latest, temp} : {indexing: false, latest, temp}, async (err, dat) => {
         if (err) {
           return reject(err)
