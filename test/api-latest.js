@@ -21,7 +21,7 @@ test.before(async t => {
 //
 
 test('archive.readdir', async t => {
-  var archive = new DatArchive(testStaticDatURL, {latest: true, localPath: tempy.directory()})
+  var archive = new DatArchive(testStaticDatURL, {datOptions: {latest: true}, localPath: tempy.directory()})
 
   // root dir
   let listing1 = await archive.readdir('/')
@@ -51,7 +51,7 @@ test('archive.readdir', async t => {
 })
 
 test('archive.readFile', async t => {
-  var archive = new DatArchive(testStaticDatURL, {latest: true, localPath: tempy.directory()})
+  var archive = new DatArchive(testStaticDatURL, {datOptions: {latest: true}, localPath: tempy.directory()})
 
   // read utf8
   var helloTxt = await archive.readFile('hello.txt')
@@ -78,12 +78,12 @@ test('archive.readFile', async t => {
   t.truthy(beakerPng.equals(beakerPngBinary))
 
   // timeout: read an archive that does not exist
-  var badArchive = new DatArchive(fakeDatURL, {latest: true, localPath: tempy.directory()})
+  var badArchive = new DatArchive(fakeDatURL, {datOptions: {latest: true}, localPath: tempy.directory()})
   await t.throws(badArchive.readFile('hello.txt', { timeout: 500 }))
 })
 
 test('archive.stat', async t => {
-  var archive = new DatArchive(testStaticDatURL, {latest: true, localPath: tempy.directory()})
+  var archive = new DatArchive(testStaticDatURL, {datOptions: {latest: true}, localPath: tempy.directory()})
 
   // stat root file
   var entry = await archive.stat('hello.txt')
@@ -113,14 +113,14 @@ test('archive.stat', async t => {
   t.deepEqual(entry.isFile(), true, 'path w/spaces in it')
 
   // timeout: stat an archive that does not exist
-  var badArchive = new DatArchive(fakeDatURL, {latest: true, localPath: tempy.directory()})
+  var badArchive = new DatArchive(fakeDatURL, {datOptions: {latest: true}, localPath: tempy.directory()})
   await t.throws(badArchive.stat('hello.txt', { timeout: 500 }))
 })
 
 test('DatArchive.create', async t => {
   // create it
   createdArchive = await DatArchive.create({
-    latest: true,
+    datOptions: {latest: true},
     localPath: tempy.directory(),
     title: 'The Title',
     description: 'The Description',
@@ -139,7 +139,7 @@ test('DatArchive.create', async t => {
 test('DatArchive.load', async t => {
   // create it
   var loadedArchive = await DatArchive.load({
-    latest: true,
+    datOptions: {latest: true},
     localPath: createdArchive._localPath
   })
 
@@ -212,20 +212,20 @@ test('archive.writeFile writes to subdirectories', async t => {
 })
 
 test('Fail to write to unowned archives', async t => {
-  var archive = new DatArchive(testStaticDatURL, {latest: true, localPath: tempy.directory()})
+  var archive = new DatArchive(testStaticDatURL, {datOptions: {latest: true}, localPath: tempy.directory()})
   await t.throws(archive.writeFile('/denythis.txt', 'hello world', 'utf8'))
   await t.throws(archive.mkdir('/denythis'))
 })
 
 test('archive.getInfo', async t => {
-  var archive = new DatArchive(testStaticDatURL, {latest: true, localPath: tempy.directory()})
+  var archive = new DatArchive(testStaticDatURL, {datOptions: {latest: true}, localPath: tempy.directory()})
   var info = await archive.getInfo()
   t.deepEqual(info.isOwner, false)
   t.deepEqual(info.version, 4)
 })
 
 test('archive.download', async t => {
-  var archive = new DatArchive(testStaticDatURL, {latest: true, localPath: tempy.directory()})
+  var archive = new DatArchive(testStaticDatURL, {datOptions: {latest: true}, localPath: tempy.directory()})
 
   // ensure not yet downloaded
   var res = await archive.stat('/hello.txt')
@@ -252,7 +252,7 @@ test('archive.download', async t => {
 
 test('archive.createFileActivityStream', async t => {
   // create a fresh dat
-  var archive = await DatArchive.create({latest: true, localPath: tempy.directory(), title: 'Another Test Dat'})
+  var archive = await DatArchive.create({datOptions: {latest: true}, localPath: tempy.directory(), title: 'Another Test Dat'})
   await archive._loadPromise
 
   // start the stream
@@ -281,7 +281,7 @@ test('archive.createNetworkActivityStream', async t => {
   // share the test static dat
   var testStaticDat2 = await createDat()
   var testStaticDat2URL = 'dat://' + testStaticDat2.archive.key.toString('hex')
-  var archive = new DatArchive(testStaticDat2URL, {latest: true, localPath: tempy.directory()})
+  var archive = new DatArchive(testStaticDat2URL, {datOptions: {latest: true}, localPath: tempy.directory()})
   await archive._loadPromise
 
   // start the download & network stream

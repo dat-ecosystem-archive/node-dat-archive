@@ -27,20 +27,20 @@ console.log(names) // => ['hello.txt']
 ```
 
 By default, `node-dat-archive` stores the Dat data in the `localPath` folder using the SLEEP format (dat's internal structure).
-If you want the folder to show the latest files (the dat cli behavior) pass `latest: true`.
+If you want the folder to show the latest files (the dat cli behavior) pass `latest: true` in the `datOptions`.
 
 ```js
 var archive = await DatArchive.create({
   localPath: './my-archive-data',
-  latest: true
+  datOptions: {latest: true}
 })
 var archive = await DatArchive.load({
   localPath: './my-archive-data',
-  latest: true
+  datOptions: {latest: true}
 })
 var archive = new DatArchive(datURL, {
   localPath: './my-archive-data',
-  latest: true
+  datOptions: {latest: true}
 })
 ```
 
@@ -62,7 +62,8 @@ This will extend node-dat-archive's defaults.
 
 ### Differences from Browser API
 
- - This module adds the `localPath` parameter to `new DatArchive` and `DatArchive.create`. Use the `localPath` to specify where the data for the archive should be stored. If not provided, the archive will be stored in memory.
+ - This module adds the `localPath` parameter. Use the `localPath` to specify where the data for the archive should be stored. If not provided, the archive will be stored in memory.
+ - This module also adds `datOptions` and `netOptions` to configure the [dat-node](https://github.com/datproject/dat-node) usage.
  - This module also adds `DatArchive.load()` to read an archive from disk.
  - This module does *yet* not include `DatArchive.fork`.
  - This module does *yet* not include `DatArchive.unlink`.
@@ -75,9 +76,9 @@ This will extend node-dat-archive's defaults.
 Refer to the [Beaker `DatArchive` docs](https://beakerbrowser.com/docs/apis/dat.html).
 
 ```js
-var archive = new DatArchive(url, {localPath:, latest:})
-var archive = await DatArchive.create({localPath:, latest:, title:, description:, type:, author:, networked:})
-var archive = await DatArchive.load({localPath:, latest:})
+var archive = new DatArchive(url, {localPath:, datOptions:, netOptions:})
+var archive = await DatArchive.create({localPath:, datOptions:, netOptions:, title:, description:, type:, author:, networked:})
+var archive = await DatArchive.load({localPath:, datOptions:, netOptions:})
 var key = await DatArchive.resolveName(url)
 archive.url
 await archive.configure({title:, description:, type:, author:, networked:})

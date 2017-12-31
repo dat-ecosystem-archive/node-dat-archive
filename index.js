@@ -26,8 +26,7 @@ const to = (opts) =>
     : DEFAULT_DAT_API_TIMEOUT
 
 class DatArchive {
-  constructor (url, {localPath, latest, datOptions, netOptions} = {}) {
-    latest = latest || false
+  constructor (url, {localPath, datOptions, netOptions} = {}) {
 
     // parse URL
     const urlp = url ? parseDatURL(url) : null
@@ -41,17 +40,20 @@ class DatArchive {
     this._loadPromise = new Promise((resolve, reject) => {
       // TODO resolve DNS
       const temp = !localPath
-      let options = urlp ? {key: urlp.hostname, sparse: true, latest, temp} : {indexing: false, latest, temp}
+      let options = urlp ? {key: urlp.hostname, sparse: true, temp} : {indexing: false, temp}
       if (datOptions) {
         Object.keys(datOptions).forEach((key) => {
           options[key] = datOptions[key]
         })
       }
-      Dat(localPath || ram, urlp ? {key: urlp.hostname, sparse: true, latest, temp} : {indexing: false, latest, temp}, async (err, dat) => {
+      if (typeof options.latest === 'undefined') {
+        options.latest = false
+      }
+      Dat(localPath || ram, options, async (err, dat) => {
         if (err) {
           return reject(err)
         }
-        dat.joinNetwork(netOptions || {})
+        dat.joinNetwork(netOptions)
         this.url = this.url || `dat://${dat.archive.key.toString('hex')}`
         this._archive = dat.archive
         this._checkout = (this._version) ? dat.archive.checkout(this._version) : dat.archive
@@ -80,7 +82,7 @@ class DatArchive {
     })
   }
 
-  static async create ({localPath, latest, title, description, type, author}) {
+  static async create ({localPath, datOptions, netOptions, title, description, type, author}) {
     // make sure the directory DNE or is empty
     if (localPath) {
       let st = await new Promise(resolve => fs.stat(localPath, (err, st) => resolve(st)))
@@ -96,13 +98,13 @@ class DatArchive {
     }
 
     // create the dat
-    var archive = new DatArchive(null, {localPath, latest})
+    var archive = new DatArchive(null, {localPath, datOptions, netOptions})
     await archive._loadPromise
     await pda.writeManifest(archive._archive, {url: archive.url, title, description, type, author})
     return archive
   }
 
-  static async load ({localPath, latest}) {
+  static async load ({localPath, datOptions, netOptions}) {
     if (!localPath) {
       throw new Error('Must provide {localPath}.')
     }
@@ -114,7 +116,7 @@ class DatArchive {
     }
 
     // load the dat
-    var archive = new DatArchive(null, {localPath, latest})
+    var archive = new DatArchive(null, {localPath, datOptions, netOptions})
     await archive._loadPromise
     return archive
   }
