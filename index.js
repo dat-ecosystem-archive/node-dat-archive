@@ -5,6 +5,12 @@ const pda = require('pauls-dat-api')
 const concat = require('concat-stream')
 const Dat = require('dat-node')
 const ram = require('random-access-memory')
+const {
+  crypto_sign_keypair,
+  crypto_sign_PUBLICKEYBYTES,
+  crypto_sign_SECRETKEYBYTES
+} = require('sodium-universal')
+
 const {datDns, timer, toEventTarget} = require('./lib/util')
 const {
   DAT_MANIFEST_FILENAME,
@@ -27,7 +33,6 @@ const to = (opts) =>
 
 class DatArchive {
   constructor (url, {localPath, datOptions, netOptions} = {}) {
-
     // parse URL
     const urlp = url ? parseDatURL(url) : null
     this.url = urlp ? `dat://${urlp.hostname}` : null
@@ -82,18 +87,37 @@ class DatArchive {
     })
   }
 
-  static async create ({localPath, datOptions, netOptions, title, description, type, author}) {
-    // make sure the directory DNE or is empty
+  static async create ({localPath, localPathTemplate, datOptions, netOptions, title, description, type, author}) {
+    if (localPathTemplate) {
+      // Create the keypair ahead of time so we can use it in path templates
+      var publicKey = Buffer.allocUnsafe(crypto_sign_PUBLICKEYBYTES)
+      var secretKey = Buffer.allocUnsafe(crypto_sign_SECRETKEYBYTES)
+      crypto_sign_keypair(publicKey, secretKey)
+
+      // Pass the key down so hypercore can know it
+      datOptions = datOptions || {}
+      datOptions.key = publicKey
+      datOptions.secretKey = secretKey
+      localPath = localPathTemplate(publicKey.toString('hex'))
+    }
+
     if (localPath) {
-      let st = await new Promise(resolve => fs.stat(localPath, (err, st) => resolve(st)))
-      if (st) {
-        if (!st.isDirectory()) {
-          throw new Error('Cannot create Dat archive. (A file exists at the target location.)')
-        }
-        let listing = await new Promise(resolve => fs.readdir(localPath, (err, listing) => resolve(listing)))
-        if (listing && listing.length > 0) {
-          throw new Error('Cannot create Dat archive. (The target folder is not empty.)')
-        }
+      // make sure the directory exists
+      await new Promise((resolve, reject) =>
+        mkdirp(localPath, err => {
+          if (!err) return resolve()
+          reject(new Error('Cannot create Dat archive. ' + err.message))
+        })
+      )
+      // and make sure it is empty
+      let listing = await new Promise((resolve, reject) =>
+        fs.readdir(localPath, (err, listing) => {
+          if (!err) return resolve(listing)
+          reject(new Error('Cannot create Dat archive. ' + err.message))
+        })
+      )
+      if (listing && listing.length > 0) {
+        throw new Error('Cannot create Dat archive. (The target folder is not empty.)')
       }
     }
 
@@ -293,7 +317,7 @@ class DatArchive {
 
   async rmdir (filepath, opts = {}) {
     return timer(to(opts), async () => {
-    filepath = massageFilepath(filepath)
+      filepath = massageFilepath(filepath)
       await this._loadPromise
       if (this._version) throw new ArchiveNotWritableError('Cannot modify a historic version')
       await assertUnprotectedFilePath(filepath)
@@ -358,4 +382,15 @@ function massageFilepath (filepath) {
     filepath = '/' + filepath
   }
   return filepath
+}
+
+function mkdirp (dir, callback) {
+  return fs.mkdir(dir, err => {
+    if (!err || err.code === 'EEXISTS') return callback()
+    if (err.code !== 'ENOENT') return callback(err)
+    return mkdirp(path.dirname(dir), err => {
+      if (err) return callback(err)
+      return fs.mkdir(dir, callback)
+    })
+  })
 }
