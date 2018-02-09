@@ -24,6 +24,7 @@
   "dependencies": {
     "beaker-error-constants": "^1.2.0",
     "concat-stream": "^1.6.0",
+    "dat-dns": "^2.0.0",
     "dat-node": "^3.5.3",
     "dom-event-target": "^1.0.0",
     "parse-dat-url": "^3.0.1",
