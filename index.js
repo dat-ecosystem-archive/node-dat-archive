@@ -121,6 +121,21 @@ class DatArchive {
     return archive
   }
 
+  static async fork (url, opt) {
+    const srcDat = new DatArchive(url)
+    const destDat = await DatArchive.create(opt)
+
+    await srcDat._loadPromise
+
+    await pda.exportArchiveToArchive({
+      srcArchive: srcDat._archive,
+      dstArchive: destDat._archive
+    })
+
+    return destDat;
+
+  }
+
   async configure (settings) {
     await this._loadPromise
     if (!settings || typeof settings !== 'object') throw new Error('Invalid argument')
