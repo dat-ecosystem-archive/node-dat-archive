@@ -28,10 +28,10 @@
     "dat-node": "^3.5.3",
     "dom-event-target": "^1.0.0",
     "parse-dat-url": "^3.0.1",
-    "pauls-dat-api": "^4.4.0"
+    "pauls-dat-api": "^8.0.3"
   },
   "devDependencies": {
-    "ava": "^0.21.0",
+    "ava": "^0.25.0",
     "tempy": "^0.1.0"
   }
 }

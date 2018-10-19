@@ -257,14 +257,14 @@ test('archive.download', async t => {
   t.deepEqual(res.downloaded, res.blocks)
 })
 
-test('archive.createFileActivityStream', async t => {
+test('archive.watch', async t => {
   // create a fresh dat
   var archive = await DatArchive.create({title: 'Another Test Dat'})
   await archive._loadPromise
 
   // start the stream
   var res = []
-  var events = archive.createFileActivityStream()
+  var events = archive.watch()
   events.addEventListener('changed', function ({path}) {
     res.push(path)
   })
@@ -282,6 +282,110 @@ test('archive.createFileActivityStream', async t => {
     await sleep(500)
   }
   t.deepEqual(res, ['/a.txt', '/b.txt', '/a.txt', '/a.txt', '/b.txt', '/c.txt'])
+})
+
+test('archive.watch (onInvalidated)', async t => {
+  // create a fresh dat
+  var archive = await DatArchive.create({title: 'Another Test Dat'})
+  await archive._loadPromise
+
+  // start the stream
+  var res = []
+  archive.watch(function ({path}) {
+    res.push(path)
+  })
+
+  // make changes
+  await archive.writeFile('/a.txt', 'one', 'utf8')
+  await archive.writeFile('/b.txt', 'one', 'utf8')
+  await archive.writeFile('/a.txt', 'one', 'utf8')
+  await archive.writeFile('/a.txt', 'two', 'utf8')
+  await archive.writeFile('/b.txt', 'two', 'utf8')
+  await archive.writeFile('/c.txt', 'one', 'utf8')
+
+  var n = 0
+  while (res.length !== 6 && ++n < 10) {
+    await sleep(500)
+  }
+  t.deepEqual(res, ['/a.txt', '/b.txt', '/a.txt', '/a.txt', '/b.txt', '/c.txt'])
+})
+
+test('archive.watch (match filename)', async t => {
+  // create a fresh dat
+  var archive = await DatArchive.create({title: 'Another Test Dat'})
+  await archive._loadPromise
+
+  // start the stream
+  var res = []
+  archive.watch('/a.txt', function ({path}) {
+    res.push(path)
+  })
+
+  // make changes
+  await archive.writeFile('/a.txt', 'one', 'utf8')
+  await archive.writeFile('/b.txt', 'one', 'utf8')
+  await archive.writeFile('/a.txt', 'one', 'utf8')
+  await archive.writeFile('/a.txt', 'two', 'utf8')
+  await archive.writeFile('/b.txt', 'two', 'utf8')
+  await archive.writeFile('/c.txt', 'one', 'utf8')
+
+  var n = 0
+  while (res.length !== 3 && ++n < 10) {
+    await sleep(500)
+  }
+  t.deepEqual(res, ['/a.txt', '/a.txt', '/a.txt'])
+})
+
+test('archive.watch (glob)', async t => {
+  // create a fresh dat
+  var archive = await DatArchive.create({title: 'Another Test Dat'})
+  await archive._loadPromise
+
+  // start the stream
+  var res = []
+  archive.watch('/*.txt', function ({path}) {
+    res.push(path)
+  })
+
+  // make changes
+  await archive.writeFile('/a.txt', 'one', 'utf8')
+  await archive.writeFile('/b.txt', 'one', 'utf8')
+  await archive.writeFile('/a.txt', 'one', 'utf8')
+  await archive.writeFile('/a.txt', 'two', 'utf8')
+  await archive.writeFile('/b.txt', 'two', 'utf8')
+  await archive.writeFile('/c.txt', 'one', 'utf8')
+
+  var n = 0
+  while (res.length !== 6 && ++n < 10) {
+    await sleep(500)
+  }
+  t.deepEqual(res, ['/a.txt', '/b.txt', '/a.txt', '/a.txt', '/b.txt', '/c.txt'])
+})
+
+test('archive.watch (array)', async t => {
+  // create a fresh dat
+  var archive = await DatArchive.create({title: 'Another Test Dat'})
+  await archive._loadPromise
+
+  // start the stream
+  var res = []
+  archive.watch(['/a.txt', '/c.txt'], function ({path}) {
+    res.push(path)
+  })
+
+  // make changes
+  await archive.writeFile('/a.txt', 'one', 'utf8')
+  await archive.writeFile('/b.txt', 'one', 'utf8')
+  await archive.writeFile('/a.txt', 'one', 'utf8')
+  await archive.writeFile('/a.txt', 'two', 'utf8')
+  await archive.writeFile('/b.txt', 'two', 'utf8')
+  await archive.writeFile('/c.txt', 'one', 'utf8')
+
+  var n = 0
+  while (res.length !== 4 && ++n < 10) {
+    await sleep(500)
+  }
+  t.deepEqual(res, ['/a.txt', '/a.txt', '/a.txt', '/c.txt'])
 })
 
 test('archive.createNetworkActivityStream', async t => {
