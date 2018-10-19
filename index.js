@@ -301,8 +301,23 @@ class DatArchive {
     })
   }
 
+  watch (pathSpec = null, onInvalidated = null) {
+    // usage: (onInvalidated)
+    if (typeof pathSpec === 'function') {
+      onInvalidated = pathSpec
+      pathSpec = null
+    }
+
+    var evts = toEventTarget(pda.watch(this._archive, pathSpec))
+    if (onInvalidated) {
+      evts.addEventListener('invalidated', onInvalidated)
+    }
+    return evts
+  }
+
   createFileActivityStream (pathPattern) {
-    return toEventTarget(pda.createFileActivityStream(this._archive, pathPattern))
+    console.warn('node-dat-archive: The DatArchive createFileActivityStream() API has been deprecated, use watch() instead.')
+    return this.watch(pathPattern)
   }
 
   createNetworkActivityStream () {
