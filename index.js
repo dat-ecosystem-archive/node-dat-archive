@@ -169,7 +169,8 @@ class DatArchive {
         title: manifest.title,
         description: manifest.description,
         type: manifest.type,
-        author: manifest.author
+        author: manifest.author,
+        links: manifest.links
       }
     })
   }
