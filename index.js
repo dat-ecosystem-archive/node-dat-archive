@@ -124,7 +124,16 @@ class DatArchive {
   async configure (settings) {
     await this._loadPromise
     if (!settings || typeof settings !== 'object') throw new Error('Invalid argument')
-    if ('title' in settings || 'description' in settings || 'type' in settings || 'author' in settings) {
+    const knownProps = [
+      'author',
+      'description',
+      'fallback_page',
+      'links',
+      'title',
+      'type',
+      'web_root'
+    ]
+    if (knownProps.filter(prop => prop in settings).length > 0) {
       await pda.updateManifest(this._archive, settings)
     }
     if ('networked' in settings) {
