@@ -155,7 +155,8 @@ test('archive.configure', async t => {
     title: 'The New Title',
     description: 'The New Description',
     type: ['dataset', 'foo'],
-    author: {name: 'Robert', url: 'dat://ffffffffffffffffffffffffffffffff'}
+    author: {name: 'Robert', url: 'dat://ffffffffffffffffffffffffffffffff'},
+    links: { prev: [{ href: 'dat://example.com' }] }
   })
 
   // check the dat.json
@@ -164,6 +165,7 @@ test('archive.configure', async t => {
   t.deepEqual(manifest.description, 'The New Description')
   t.deepEqual(manifest.type, ['dataset', 'foo'])
   t.deepEqual(manifest.author, {name: 'Robert', url: 'dat://ffffffffffffffffffffffffffffffff'})
+  t.deepEqual(manifest.links, { prev: [{ href: 'dat://example.com' }] })
 })
 
 test('archive.writeFile', async t => {
